@@ -1,17 +1,29 @@
-- name: Check Supabase secrets
-  env:
-    SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-    SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
-  run: |
-    if [ -z "$SUPABASE_URL" ]; then
-      echo "SUPABASE_URL is EMPTY"
-      exit 1
-    fi
+name: Supabase Keep Alive
 
-    if [ -z "$SUPABASE_KEY" ]; then
-      echo "SUPABASE_PUBLISHABLE_KEY is EMPTY"
-      exit 1
-    fi
+on:
+  workflow_dispatch:
 
-    echo "SUPABASE_URL is available"
-    echo "SUPABASE_PUBLISHABLE_KEY is available"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test Supabase secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          echo "URL length: ${#SUPABASE_URL}"
+          echo "KEY length: ${#SUPABASE_KEY}"
+
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "SUPABASE_URL IS EMPTY"
+            exit 1
+          fi
+
+          if [ -z "$SUPABASE_KEY" ]; then
+            echo "SUPABASE_PUBLISHABLE_KEY IS EMPTY"
+            exit 1
+          fi
+
+          echo "Both secrets are available"
