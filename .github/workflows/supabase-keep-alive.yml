@@ -1,43 +1,17 @@
-name: Supabase Keep Alive
+- name: Check Supabase secrets
+  env:
+    SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+    SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+  run: |
+    if [ -z "$SUPABASE_URL" ]; then
+      echo "SUPABASE_URL is EMPTY"
+      exit 1
+    fi
 
-on:
-  schedule:
-    - cron: "17 3 * * *"
-  workflow_dispatch:
+    if [ -z "$SUPABASE_KEY" ]; then
+      echo "SUPABASE_PUBLISHABLE_KEY is EMPTY"
+      exit 1
+    fi
 
-jobs:
-  keep-alive:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check secrets
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
-        run: |
-          if [ -z "$SUPABASE_URL" ]; then
-            echo "ERROR: SUPABASE_URL is empty"
-            exit 1
-          fi
-
-          if [ -z "$SUPABASE_KEY" ]; then
-            echo "ERROR: SUPABASE_PUBLISHABLE_KEY is empty"
-            exit 1
-          fi
-
-          echo "Both secrets are available."
-
-      - name: Ping Supabase
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
-        run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "apikey: $SUPABASE_KEY" \
-            "$SUPABASE_URL/rest/v1/keep_alive?select=id")
-
-          echo "Supabase response: $response"
-
-          if [ "$response" != "200" ]; then
-            exit 1
-          fi
+    echo "SUPABASE_URL is available"
+    echo "SUPABASE_PUBLISHABLE_KEY is available"
